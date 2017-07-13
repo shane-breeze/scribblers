@@ -24,25 +24,47 @@ class ComponentName(object):
 
 ##__________________________________________________________________||
 class SMSMass(object):
+
+    DEFAULT_MASSDICT = {
+        'SMS_T1tttt': ('GenSusyMGluino', 'GenSusyMNeutralino'),
+        'SMS_T1bbbb': ('GenSusyMGluino', 'GenSusyMNeutralino'),
+        'SMS_T1qqqq': ('GenSusyMGluino', 'GenSusyMNeutralino'),
+        'SMS_T2tt': ('GenSusyMStop', 'GenSusyMNeutralino'),
+        'SMS_T2bb': ('GenSusyMSbottom', 'GenSusyMNeutralino'),
+        'SMS_T2qq': ('GenSusyMSquark', 'GenSusyMNeutralino'),
+    }
+
+    def __init__(self, massdict = None):
+        self.massdict = massdict if massdict else self.DEFAULT_MASSDICT
+
+    def __repr__(self):
+        name_value_pairs = (
+            ('massdict', self.massdict),
+        )
+        return '{}({})'.format(
+            self.__class__.__name__,
+            ', '.join(['{} = {!r}'.format(n, v) for n, v in name_value_pairs]),
+        )
+
     def begin(self, event):
 
-        massdict = {
-            'SMS_T1tttt': ('GenSusyMGluino', 'GenSusyMNeutralino'),
-            'SMS_T1bbbb': ('GenSusyMGluino', 'GenSusyMNeutralino'),
-            'SMS_T1qqqq': ('GenSusyMGluino', 'GenSusyMNeutralino'),
-            'SMS_T2tt': ('GenSusyMStop', 'GenSusyMNeutralino'),
-            'SMS_T2bb': ('GenSusyMSbottom', 'GenSusyMNeutralino'),
-            'SMS_T2qq': ('GenSusyMSquark', 'GenSusyMNeutralino'),
-        }
+        componentName = event.componentName[0]
 
-        smsname =  '_'.join(event.componentName[0].split('_')[0:2])
+        smsnames = self.massdict.keys()
+        smsnames = sorted(smsnames, key = len, reverse = True)
+        # so that longer names are tested before shorter names
+
+        smsnames = [k for k in smsnames if componentName.startswith(k)]
+
+        if not smsnames:
+            self.sms = False
+            return
+
+        self.sms = True
+        smsname = smsnames[0]
         # e.g., 'SMS_T1tttt'
 
-        self.sms = smsname in massdict
-
-        if not self.sms: return
-
-        self.mass1, self.mass2 = massdict[smsname]
+        self.mass1, self.mass2 = self.massdict[smsname]
         self._attach_to_event(event)
 
     def _attach_to_event(self, event):
