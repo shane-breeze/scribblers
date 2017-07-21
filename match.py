@@ -37,9 +37,9 @@ class DeltaR(object):
 
     def _deltaPhi(self, phi1, phi2):
         ret = phi1 - phi2
-        while ret > 2*np.pi:
+        while ret >= 2*np.pi:
             ret -= 2*np.pi
-        while ret < -2*np.pi:
+        while ret <= -2*np.pi:
             ret += 2*np.pi
         return ret
 
