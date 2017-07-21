@@ -69,60 +69,6 @@ class Test_ObjectMatch(unittest.TestCase):
         self.assertIsNone(obj.obj1_unmatched)
         self.assertIsNone(obj.obj2_unmatched)
 
-    def test_event_empty_AB(self):
-
-        obj = self.obj
-        event = self.event
-
-        obj.begin(event)
-
-        self.event.A[:] = [ ]
-        self.event.B[:] = [ ]
-        obj.event(event)
-
-        self.assertEqual(0, len(event.Amatched))
-        self.assertEqual(0, len(event.BmatchedSorted))
-        self.assertEqual(0, len(event.Aunmatched))
-        self.assertEqual(0, len(event.Bunmatched))
-
-    def test_event_empty_A(self):
-
-        obj = self.obj
-        event = self.event
-
-        obj.begin(event)
-
-        o1 = Object((('x', 0), ('y', 0)))
-        o2 = Object((('x', 1), ('y', 0)))
-
-        self.event.A[:] = [ ]
-        self.event.B[:] = [o1, o2]
-        obj.event(event)
-
-        self.assertEqual([ ], event.Amatched)
-        self.assertEqual([ ], event.BmatchedSorted)
-        self.assertEqual([ ], event.Aunmatched)
-        self.assertEqual([o1, o2], event.Bunmatched)
-
-    def test_event_empty_B(self):
-
-        obj = self.obj
-        event = self.event
-
-        obj.begin(event)
-
-        o1 = Object((('x', 0), ('y', 0)))
-        o2 = Object((('x', 1), ('y', 0)))
-
-        self.event.A[:] = [o1, o2]
-        self.event.B[:] = [ ]
-        obj.event(event)
-
-        self.assertEqual([ ], event.Amatched)
-        self.assertEqual([ ], event.BmatchedSorted)
-        self.assertEqual([o1, o2], event.Aunmatched)
-        self.assertEqual([ ], event.Bunmatched)
-
     def test_event_simple(self):
 
         obj = self.obj
@@ -144,46 +90,103 @@ class Test_ObjectMatch(unittest.TestCase):
         self.assertEqual([a2], event.Aunmatched)
         self.assertEqual([b2], event.Bunmatched)
 
-    def test_event_2A_within_distance(self):
+    def test_match_empty_AB(self):
 
         obj = self.obj
-        event = self.event
 
-        obj.begin(event)
+        A = [ ]
+        B = [ ]
+        Amatched, BmatchedSorted, Aunmatched, Bunmatched = obj._match(A, B)
+
+        self.assertEqual(0, len(Amatched))
+        self.assertEqual(0, len(BmatchedSorted))
+        self.assertEqual(0, len(Aunmatched))
+        self.assertEqual(0, len(Bunmatched))
+
+    def test_match_empty_A(self):
+
+        obj = self.obj
+
+        o1 = Object((('x', 0), ('y', 0)))
+        o2 = Object((('x', 1), ('y', 0)))
+
+        A = [ ]
+        B = [o1, o2]
+        Amatched, BmatchedSorted, Aunmatched, Bunmatched = obj._match(A, B)
+
+        self.assertEqual([ ], Amatched)
+        self.assertEqual([ ], BmatchedSorted)
+        self.assertEqual([ ], Aunmatched)
+        self.assertEqual([o1, o2], Bunmatched)
+
+    def test_match_empty_B(self):
+
+        obj = self.obj
+
+        o1 = Object((('x', 0), ('y', 0)))
+        o2 = Object((('x', 1), ('y', 0)))
+
+        A = [o1, o2]
+        B = [ ]
+        Amatched, BmatchedSorted, Aunmatched, Bunmatched = obj._match(A, B)
+
+        self.assertEqual([ ], Amatched)
+        self.assertEqual([ ], BmatchedSorted)
+        self.assertEqual([o1, o2], Aunmatched)
+        self.assertEqual([ ], Bunmatched)
+
+    def test_match_simple(self):
+
+        obj = self.obj
+
+        a1 = Object((('x', 0), ('y', 0)))
+        a2 = Object((('x', 0), ('y', 3)))
+        b1 = Object((('x', 1), ('y', 0)))
+        b2 = Object((('x', 3), ('y', 0)))
+
+        A = [a1, a2]
+        B = [b1, b2]
+        Amatched, BmatchedSorted, Aunmatched, Bunmatched = obj._match(A, B)
+
+        self.assertEqual([a1], Amatched)
+        self.assertEqual([b1], BmatchedSorted)
+        self.assertEqual([a2], Aunmatched)
+        self.assertEqual([b2], Bunmatched)
+
+    def test_match_2A_within_distance(self):
+
+        obj = self.obj
 
         a1 = Object((('x', 0), ('y', 0)))
         a2 = Object((('x', 1.5), ('y', 0)))
         b1 = Object((('x', 1), ('y', 0)))
         b2 = Object((('x', 5), ('y', 0)))
 
-        self.event.A[:] = [a1, a2]
-        self.event.B[:] = [b1, b2]
-        obj.event(event)
+        A = [a1, a2]
+        B = [b1, b2]
+        Amatched, BmatchedSorted, Aunmatched, Bunmatched = obj._match(A, B)
 
-        self.assertEqual([a2], event.Amatched)
-        self.assertEqual([b1], event.BmatchedSorted)
-        self.assertEqual([a1], event.Aunmatched)
-        self.assertEqual([b2], event.Bunmatched)
+        self.assertEqual([a2], Amatched)
+        self.assertEqual([b1], BmatchedSorted)
+        self.assertEqual([a1], Aunmatched)
+        self.assertEqual([b2], Bunmatched)
 
-    def test_event_2B_within_distance(self):
+    def test_match_2B_within_distance(self):
 
         obj = self.obj
-        event = self.event
-
-        obj.begin(event)
 
         a1 = Object((('x', 0), ('y', 0)))
         a2 = Object((('x', 5), ('y', 0)))
         b1 = Object((('x', 1), ('y', 0)))
         b2 = Object((('x', 1.5), ('y', 0)))
 
-        self.event.A[:] = [a1, a2]
-        self.event.B[:] = [b1, b2]
-        obj.event(event)
+        A = [a1, a2]
+        B = [b1, b2]
+        Amatched, BmatchedSorted, Aunmatched, Bunmatched = obj._match(A, B)
 
-        self.assertEqual([a1], event.Amatched)
-        self.assertEqual([b1], event.BmatchedSorted)
-        self.assertEqual([a2], event.Aunmatched)
-        self.assertEqual([b2], event.Bunmatched)
+        self.assertEqual([a1], Amatched)
+        self.assertEqual([b1], BmatchedSorted)
+        self.assertEqual([a2], Aunmatched)
+        self.assertEqual([b2], Bunmatched)
 
 ##__________________________________________________________________||
