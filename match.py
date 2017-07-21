@@ -109,26 +109,38 @@ class ObjectMatch(object):
 
         distances = [[(i1, i2, self.distance_func(o1, o2)) for i1, o1 in enumerate(obj1)] for i2, o2 in enumerate(obj2)]
         # a list of lists of (index1, index2, distance) grouped by index2
-        # e.g., [[(0, 0, 0.12), (1, 0, 0.32)], [(0, 1, 0.10), (1, 0, 0.52)], ...]
+        # e.g.,
+        # [
+        #     [(0, 0, 13.0), (1, 0, 10.0), (2, 0, 7.0), (3, 0, 4.0)],
+        #     [(0, 1, 6.5), (1, 1, 3.5), (2, 1, 0.5), (3, 1, 2.5)],
+        #     [(0, 2, 5.0), (1, 2, 2.0), (2, 2, 1.0), (3, 2, 4.0)],
+        #     [(0, 3, 2.0), (1, 3, 1.0), (2, 3, 4.0), (3, 3, 7.0)],
+        #     [(0, 4, 1.0), (1, 4, 2.0), (2, 4, 5.0), (3, 4, 8.0)]
+        # ]
 
         distances = [l for l in distances if l]
         # remove empty sublists
 
         distances = (min(l, key = operator.itemgetter(2)) for l in distances)
         # select one with the minimum distance in each sublist
-        # e.g., [(0, 0, 0.12), (0, 1, 0.10), ...]
+        # e.g., [(3, 0, 4.0), (2, 1, 0.5), (2, 2, 1.0), (1, 3, 1.0), (0, 4, 1.0)]
 
         distances = (l for l in distances if l[2] <= self.max_distance)
         # remove ones with distances greater than maximum distances
+        # e.g., [(2, 1, 0.5), (2, 2, 1.0), (1, 3, 1.0), (0, 4, 1.0)]
+        # note index1 == 2 happens twice
 
         distances = sorted(distances, key = operator.itemgetter(0))
         # sort by index1
+        # e.g., [(0, 4, 1.0), (1, 3, 1.0), (2, 1, 0.5), (2, 2, 1.0)]
 
         distances = [list(g) for _, g in itertools.groupby(distances, key = operator.itemgetter(0))]
-        # group by index2
+        # group by index1
+        # e.g., [[(0, 4, 1.0)], [(1, 3, 1.0)], [(2, 1, 0.5), (2, 2, 1.0)]]
 
         distances = [min(l, key = operator.itemgetter(2)) for l in distances]
         # select one with the minimum distance in each sublist
+        # e.g., [(0, 4, 1.0), (1, 3, 1.0), (2, 1, 0.5)]
 
         obj1_matched = [obj1[i] for i, j, d in distances]
         obj2_matched_sorted = [obj2[j] for i, j, d in distances]

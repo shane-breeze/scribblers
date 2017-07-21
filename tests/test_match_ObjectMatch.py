@@ -77,18 +77,23 @@ class Test_ObjectMatch(unittest.TestCase):
         obj.begin(event)
 
         a1 = Object((('x', 0), ('y', 0)))
-        a2 = Object((('x', 0), ('y', 3)))
-        b1 = Object((('x', 1), ('y', 0)))
-        b2 = Object((('x', 3), ('y', 0)))
+        a2 = Object((('x', 3), ('y', 0)))
+        a3 = Object((('x', 6), ('y', 0)))
+        a4 = Object((('x', 9), ('y', 0)))
+        b1 = Object((('x', 13), ('y', 0)))
+        b2 = Object((('x', 6.5), ('y', 0)))
+        b3 = Object((('x', 5), ('y', 0)))
+        b4 = Object((('x', 2), ('y', 0)))
+        b5 = Object((('x', 1), ('y', 0)))
 
-        self.event.A[:] = [a1, a2]
-        self.event.B[:] = [b1, b2]
+        self.event.A[:] = [a1, a2, a3, a4]
+        self.event.B[:] = [b1, b2, b3, b4, b5]
         obj.event(event)
 
-        self.assertEqual([a1], event.Amatched)
-        self.assertEqual([b1], event.BmatchedSorted)
-        self.assertEqual([a2], event.Aunmatched)
-        self.assertEqual([b2], event.Bunmatched)
+        self.assertEqual([a1, a2, a3], event.Amatched)
+        self.assertEqual([b5, b4, b2], event.BmatchedSorted)
+        self.assertEqual([a4], event.Aunmatched)
+        self.assertEqual([b1, b3], event.Bunmatched)
 
     def test_match_empty_AB(self):
 
