@@ -1,7 +1,16 @@
 import unittest
 
-from ..jec import ApplyJEC
-from ..obj import Object
+##__________________________________________________________________||
+has_alphatwirl = False
+try:
+    import alphatwirl
+    has_alphatwirl = True
+except ImportError:
+    pass
+
+if has_alphatwirl:
+    from ..jec import ApplyJEC
+    from ..obj import Object
 
 ##__________________________________________________________________||
 class MockScaleFunc(object):
@@ -14,6 +23,7 @@ class MockScaleFunc(object):
         return self.ret
 
 ##__________________________________________________________________||
+@unittest.skipUnless(has_alphatwirl, "has no alphatwirl")
 class Test_ApplyJEC(unittest.TestCase):
 
     def setUp(self):
