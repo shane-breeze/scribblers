@@ -2,3 +2,4 @@ numpy>=1.11
 pandas>=0.20.3
 pytest-cov
 codecov
+alphatwirl==0.9.6
