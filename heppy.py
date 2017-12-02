@@ -129,7 +129,7 @@ class ArraysIntoObjectZip(object):
         arrays = (getattr(event, n) for n in self.in_names)
         # e.g., (event.jet_pt, event.jet_eta, event.jet_phi)
 
-        attr_values_list = itertools.izip(*arrays)
+        attr_values_list = zip(*arrays)
         # e.g., ((pt[0], eta[0], phi[0]), (pt[1], eta[1], phi[1]), ...)
 
         attr_name_value_pairs = (zip(self.out_attr_names, attr_values) for attr_values in attr_values_list)
