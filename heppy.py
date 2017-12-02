@@ -137,7 +137,7 @@ class ArraysIntoObjectZip(object):
         #        (('Pt', (pt[1]), ('Eta', eta[1]), ('Phi', phi[1])), ...)
         # print attr_name_value_pairs
 
-        self.out[:] = [obj.Object(pair) for pair in attr_name_value_pairs]
+        self.out[:] = [obj.Object(pairs) for pairs in attr_name_value_pairs]
         # e.g., [Object(), Object(), ...]
 
     def end(self):
