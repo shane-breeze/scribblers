@@ -2,7 +2,7 @@
 import collections
 import itertools
 
-import obj
+from . import obj
 
 ##__________________________________________________________________||
 class ComponentName(object):
