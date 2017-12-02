@@ -1,5 +1,5 @@
 import unittest
-import cStringIO
+import io
 
 ##__________________________________________________________________||
 has_alphatwirl = False
@@ -13,7 +13,7 @@ if has_alphatwirl:
     from ..jec import ScalePtByFactorOfPtEtaFromTbl
 
 ##__________________________________________________________________||
-tbl_corr_txt = """
+tbl_corr_txt = b"""
  jet_eta   jet_pt    corr
     -1.5  26.8573  1.1774
     -0.5  26.9680  1.1726
@@ -51,7 +51,7 @@ tbl_corr_txt = """
 class Test_ObjectCorrection(unittest.TestCase):
 
     def setUp(self):
-        f = cStringIO.StringIO(tbl_corr_txt)
+        f = io.BytesIO(tbl_corr_txt)
         self.obj = ScalePtByFactorOfPtEtaFromTbl(
             tbl_corr_path = f,
             valid_eta_range = (-3, 3),
