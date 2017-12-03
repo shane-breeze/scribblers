@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 if has_alphatwirl:
-    from ..jec import ScalePtByFactorOfPtEtaFromTbl
+    from scribblers.jec import ScalePtByFactorOfPtEtaFromTbl
 
 ##__________________________________________________________________||
 tbl_corr_txt = b"""

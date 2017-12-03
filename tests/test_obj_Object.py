@@ -2,7 +2,7 @@
 import unittest
 import copy
 
-from ..obj import Object
+from scribblers.obj import Object
 
 ##__________________________________________________________________||
 class Test_Object(unittest.TestCase):

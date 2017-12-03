@@ -1,6 +1,6 @@
 import unittest
 
-from ..heppy import SMSMass
+from scribblers.heppy import SMSMass
 from .mock import MockEvent
 
 ##__________________________________________________________________||

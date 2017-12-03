@@ -1,7 +1,7 @@
 import unittest
 
-from ..obj import Flatten
-from ..obj import Object
+from scribblers.obj import Flatten
+from scribblers.obj import Object
 from .mock import MockEvent
 
 ##__________________________________________________________________||

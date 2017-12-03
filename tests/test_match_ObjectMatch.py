@@ -1,8 +1,8 @@
 import unittest
 import math
 
-from ..match import ObjectMatch, DeltaR
-from ..obj import Object
+from scribblers.match import ObjectMatch, DeltaR
+from scribblers.obj import Object
 from .mock import MockEvent
 
 ##__________________________________________________________________||

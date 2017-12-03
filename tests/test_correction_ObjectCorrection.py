@@ -1,8 +1,8 @@
 import unittest
 import copy
 
-from ..correction import ObjectCorrection
-from ..obj import Object
+from scribblers.correction import ObjectCorrection
+from scribblers.obj import Object
 from .mock import MockEvent
 
 ##__________________________________________________________________||

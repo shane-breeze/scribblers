@@ -1,8 +1,8 @@
 import unittest
 import math
 
-from ..match import DeltaR
-from ..obj import Object
+from scribblers.match import DeltaR
+from scribblers.obj import Object
 
 ##__________________________________________________________________||
 class Test_DeltaR(unittest.TestCase):

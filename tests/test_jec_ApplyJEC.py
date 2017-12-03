@@ -9,8 +9,8 @@ except ImportError:
     pass
 
 if has_alphatwirl:
-    from ..jec import ApplyJEC
-    from ..obj import Object
+    from scribblers.jec import ApplyJEC
+    from scribblers.obj import Object
 
 ##__________________________________________________________________||
 class MockScaleFunc(object):

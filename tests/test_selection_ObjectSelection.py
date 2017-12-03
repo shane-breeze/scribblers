@@ -1,7 +1,7 @@
 import unittest
 
-from ..selection import ObjectSelection
-from ..obj import Object
+from scribblers.selection import ObjectSelection
+from scribblers.obj import Object
 from .mock import MockEvent
 
 ##__________________________________________________________________||

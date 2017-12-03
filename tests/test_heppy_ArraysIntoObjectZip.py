@@ -1,7 +1,7 @@
 import unittest
 
-from ..heppy import ArraysIntoObjectZip
-from ..obj import Object
+from scribblers.heppy import ArraysIntoObjectZip
+from scribblers.obj import Object
 from .mock import MockEvent
 
 ##__________________________________________________________________||
