@@ -1,9 +1,8 @@
 
-#### How to run the unit tests.
+#### How to run the tests.
 
 ##### Run all tests
 
-from two directories up from this directory:
 ```
-python -m unittest discover -s ./scribblers/tests/ -t .
+pytest
 ```
