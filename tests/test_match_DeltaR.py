@@ -1,49 +1,48 @@
-import unittest
+# Tai Sakuma <tai.sakuma@gmail.com>
+
+import pytest
+
 import math
 
 from scribblers.match import DeltaR
 from scribblers.obj import Object
 
 ##__________________________________________________________________||
-class Test_DeltaR(unittest.TestCase):
+@pytest.fixture()
+def obj():
+    return DeltaR(
+        obj1_eta_phi_names = ('eta', 'phi'),
+        obj2_eta_phi_names = ('eta', 'phi')
+    )
 
-    def setUp(self):
-        self.obj = DeltaR(
-            obj1_eta_phi_names = ('eta', 'phi'),
-            obj2_eta_phi_names = ('eta', 'phi')
-        )
+def test_repr(obj):
+    repr(obj)
 
-    def tearDown(self):
-        pass
+def test_call(obj):
+    o1 = Object((('eta', 0), ('phi', 0)))
+    o2 = Object((('eta', 0), ('phi', 0)))
+    assert obj(o1, o2) == 0.0
 
-    def test_repr(self):
-        repr(self.obj)
+    o1 = Object((('eta', 0.5), ('phi', 0.5)))
+    o2 = Object((('eta', 0), ('phi', 0)))
+    assert obj(o1, o2) == math.sqrt(0.5**2 + 0.5**2)
 
-    def test_call(self):
-        o1 = Object((('eta', 0), ('phi', 0)))
-        o2 = Object((('eta', 0), ('phi', 0)))
-        self.assertEqual(0.0, self.obj(o1, o2))
+def test_call_exactly_multiple_2pi(obj):
 
-        o1 = Object((('eta', 0.5), ('phi', 0.5)))
-        o2 = Object((('eta', 0), ('phi', 0)))
-        self.assertEqual(math.sqrt(0.5**2 + 0.5**2), self.obj(o1, o2))
+    o1 = Object((('eta', 0), ('phi', 0)))
+    o2 = Object((('eta', 0), ('phi', 2*math.pi)))
+    assert obj(o1, o2) == 0.0
 
-    def test_call_exactly_multiple_2pi(self):
+    o1 = Object((('eta', 0), ('phi', 0)))
+    o2 = Object((('eta', 0), ('phi', 4*math.pi)))
+    assert obj(o1, o2) == 0.0
 
-        o1 = Object((('eta', 0), ('phi', 0)))
-        o2 = Object((('eta', 0), ('phi', 2*math.pi)))
-        self.assertEqual(0.0, self.obj(o1, o2))
+    o1 = Object((('eta', 0), ('phi', 2*math.pi)))
+    o2 = Object((('eta', 0), ('phi', 0)))
+    assert obj(o1, o2) == 0.0
 
-        o1 = Object((('eta', 0), ('phi', 0)))
-        o2 = Object((('eta', 0), ('phi', 4*math.pi)))
-        self.assertEqual(0.0, self.obj(o1, o2))
-
-        o1 = Object((('eta', 0), ('phi', 2*math.pi)))
-        o2 = Object((('eta', 0), ('phi', 0)))
-        self.assertEqual(0.0, self.obj(o1, o2))
-
-        o1 = Object((('eta', 0), ('phi', 4*math.pi)))
-        o2 = Object((('eta', 0), ('phi', 0)))
-        self.assertEqual(0.0, self.obj(o1, o2))
+    o1 = Object((('eta', 0), ('phi', 4*math.pi)))
+    o2 = Object((('eta', 0), ('phi', 0)))
+    assert obj(o1, o2) == 0.0
 
 ##__________________________________________________________________||
