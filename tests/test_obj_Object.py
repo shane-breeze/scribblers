@@ -1,70 +1,63 @@
 # Tai Sakuma <tai.sakuma@gmail.com>
-import unittest
+
 import copy
+import pytest
 
 from scribblers.obj import Object
 
 ##__________________________________________________________________||
-class Test_Object(unittest.TestCase):
+@pytest.fixture()
+def obj():
+    return Object([('pt', 40.0), ('eta', 1.1), ('phi', 0.1)])
 
-    def setUp(self):
-        self.obj = Object([('pt', 40.0), ('eta', 1.1), ('phi', 0.1)])
+##__________________________________________________________________||
+def test_repr(obj):
+    repr(obj)
 
-    def tearDown(self):
-        pass
+def test_attr(obj):
+    assert obj.pt == 40.0
+    assert obj.eta == 1.1
+    assert obj.phi == 0.1
 
-    def test_repr(self):
-        repr(self.obj)
+def test_attr_raise(obj):
+    with pytest.raises(AttributeError):
+        obj.mass
 
-    def test_attr(self):
-        self.assertEqual(40.0, self.obj.pt)
-        self.assertEqual(1.1, self.obj.eta)
-        self.assertEqual(0.1, self.obj.phi)
+def test_init_no_args():
+    Object()
 
-    def test_attr_raise(self):
-        self.assertRaises(AttributeError, self.obj.__getattr__, 'mass')
+def test_init_copy(obj):
+    obj_copy = Object(obj)
+    assert obj == obj_copy
+    assert obj is not obj_copy
+    assert obj._attrdict is not obj_copy._attrdict
 
-    def test_init_no_args(self):
-        Object()
+def test_init_copy_extra_args(obj):
+    obj_copy = Object(obj, 1)
+    assert obj == obj_copy
+    assert obj is not obj_copy
+    assert obj._attrdict is not obj_copy._attrdict
 
-    def test_init_copy(self):
-        obj = Object(self.obj)
-        self.assertEqual(self.obj, obj)
-        self.assertIsNot(self.obj, obj)
-        self.assertIsNot(self.obj._attrdict, obj._attrdict)
+def test_init_copy_extra_kwargs(obj):
+    obj_copy = Object(obj, A = 10)
+    assert obj == obj_copy
+    assert obj is not obj_copy
+    assert obj._attrdict is not obj_copy._attrdict
 
-    def test_init_copy_extra_args(self):
-        obj = Object(self.obj, 1)
-        self.assertEqual(self.obj, obj)
-        self.assertIsNot(self.obj, obj)
-        self.assertIsNot(self.obj._attrdict, obj._attrdict)
+def test_copy(obj):
+    obj_copy = copy.copy(obj)
+    assert obj == obj_copy
+    assert obj is not obj_copy
+    assert obj._attrdict is not obj_copy._attrdict
 
-    def test_init_copy_extra_kwargs(self):
-        obj = Object(self.obj, A = 10)
-        self.assertEqual(self.obj, obj)
-        self.assertIsNot(self.obj, obj)
-        self.assertIsNot(self.obj._attrdict, obj._attrdict)
+def test_setattr_modify(obj):
+    obj.pt = 50.0
+    assert obj.pt == 50.0
+    assert obj == Object([('pt', 50.0), ('eta', 1.1), ('phi', 0.1)])
 
-    def test_copy(self):
-        obj = copy.copy(self.obj)
-        self.assertEqual(self.obj, obj)
-        self.assertIsNot(self.obj, obj)
-        self.assertIsNot(self.obj._attrdict, obj._attrdict)
-
-    def test_setattr_modify(self):
-        self.obj.pt = 50.0
-        self.assertEqual(50.0, self.obj.pt)
-        self.assertEqual(
-            Object([('pt', 50.0), ('eta', 1.1), ('phi', 0.1)]),
-            self.obj
-            )
-
-    def test_setattr_newattr(self):
-        self.obj.mass = 15.0
-        self.assertEqual(15.0, self.obj.mass)
-        self.assertEqual(
-            Object([('pt', 40.0), ('eta', 1.1), ('phi', 0.1), ('mass', 15.0)]),
-            self.obj
-            )
+def test_setattr_newattr(obj):
+    obj.mass = 15.0
+    assert obj.mass == 15.0
+    assert obj == Object([('pt', 40.0), ('eta', 1.1), ('phi', 0.1), ('mass', 15.0)])
 
 ##__________________________________________________________________||
