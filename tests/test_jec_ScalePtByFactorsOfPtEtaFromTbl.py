@@ -1,16 +1,7 @@
 import unittest
 import io
 
-##__________________________________________________________________||
-has_alphatwirl = False
-try:
-    import alphatwirl
-    has_alphatwirl = True
-except ImportError:
-    pass
-
-if has_alphatwirl:
-    from scribblers.jec import ScalePtByFactorOfPtEtaFromTbl
+from scribblers.jec import ScalePtByFactorOfPtEtaFromTbl
 
 ##__________________________________________________________________||
 tbl_corr_txt = b"""
@@ -47,7 +38,6 @@ tbl_corr_txt = b"""
 """[1:] # to remove the fist line break
 
 ##__________________________________________________________________||
-@unittest.skipUnless(has_alphatwirl, "has no alphatwirl")
 class Test_ObjectCorrection(unittest.TestCase):
 
     def setUp(self):

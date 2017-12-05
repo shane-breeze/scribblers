@@ -1,12 +1,6 @@
 
 
 ##__________________________________________________________________||
-import os, sys
-scripts_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-alphatwirl_path = os.path.join(scripts_dir, 'AlphaTwirl')
-sys.path.insert(1, alphatwirl_path)
-
-##__________________________________________________________________||
 import logging
 log_handler = logging.StreamHandler()
 log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

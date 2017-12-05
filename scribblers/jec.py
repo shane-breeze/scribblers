@@ -4,7 +4,7 @@ import copy
 import pandas as pd
 import numpy as np
 
-import alphatwirl
+from ._util.Binning import Binning
 
 ##__________________________________________________________________||
 class ScalePtByFactorOfPtEtaFromTbl(object):
@@ -19,7 +19,7 @@ class ScalePtByFactorOfPtEtaFromTbl(object):
         tbl = tbl_corr.sort_values(by = ['jet_eta', 'jet_pt']).reset_index(drop = True)
 
         eta_bin_boundaries = tbl['jet_eta'].unique()
-        self.eta_binning =  alphatwirl.binning.Binning(boundaries = eta_bin_boundaries)
+        self.eta_binning =  Binning(boundaries = eta_bin_boundaries)
 
         self.pt_binning_dict = { } # key: eta_bin
         self.corr_dict = { } # key: (eta_bin, pt_bin)
@@ -28,7 +28,7 @@ class ScalePtByFactorOfPtEtaFromTbl(object):
         for eta, g in tbl.groupby('jet_eta'):
             pt_bin_boundaries = g['jet_pt'].values
             scale_factors =  g['corr'].values
-            self.pt_binning_dict[eta] = alphatwirl.binning.Binning(boundaries = pt_bin_boundaries)
+            self.pt_binning_dict[eta] = Binning(boundaries = pt_bin_boundaries)
             self.corr_dict.update({(eta, pt): corr for pt, corr in zip(pt_bin_boundaries, scale_factors)})
             self.corr_minpt_dict[eta] = scale_factors[0]
 
