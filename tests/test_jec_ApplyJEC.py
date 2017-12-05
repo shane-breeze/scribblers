@@ -1,4 +1,6 @@
-import unittest
+# Tai Sakuma <tai.sakuma@gmail.com>
+
+import pytest
 
 from scribblers.jec import ApplyJEC
 from scribblers.obj import Object
@@ -14,30 +16,27 @@ class MockScaleFunc(object):
         return self.ret
 
 ##__________________________________________________________________||
-class Test_ApplyJEC(unittest.TestCase):
+@pytest.fixture()
+def scale_func():
+    return MockScaleFunc()
 
-    def setUp(self):
-        self.scale_func = MockScaleFunc()
-        self.obj = ApplyJEC(
-            scale_func_pt_eta = self.scale_func
-        )
+@pytest.fixture()
+def obj(scale_func):
+    return ApplyJEC(
+        scale_func_pt_eta = scale_func
+    )
 
-    def tearDown(self):
-        pass
+##__________________________________________________________________||
+def test_repr(obj, scale_func):
+    repr(obj)
 
-    def test_repr(self):
-        repr(self.obj)
+def test_call(obj, scale_func):
+    scale_func.ret = 48.0
 
-    def test_call(self):
-        self.scale_func.ret = 48.0
+    jet = Object([('pt', 40.0), ('eta', 1.1), ('phi', 0.1)])
+    jet_corr = obj(jet)
 
-        jet = Object([('pt', 40.0), ('eta', 1.1), ('phi', 0.1)])
-        jet_corr = self.obj(jet)
-
-        self.assertEqual((40.0, 1.1),  self.scale_func.args)
-        self.assertEqual(
-            Object([('pt', 48.0), ('eta', 1.1), ('phi', 0.1)]),
-            jet_corr
-        )
+    assert scale_func.args == (40.0, 1.1)
+    assert jet_corr == Object([('pt', 48.0), ('eta', 1.1), ('phi', 0.1)])
 
 ##__________________________________________________________________||
