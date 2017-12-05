@@ -1,122 +1,108 @@
-import unittest
+# Tai Sakuma <tai.sakuma@gmail.com>
+
+import pytest
 
 from scribblers.obj import Flatten
 from scribblers.obj import Object
 from .mock import MockEvent
 
 ##__________________________________________________________________||
-class Test_Flatten(unittest.TestCase):
+@pytest.fixture()
+def obj():
+    return Flatten(
+        in_obj = 'Jet',
+        in_attr_names = ['Pt', 'Eta', 'Phi'],
+        out_array_prefix = 'jet',
+        out_array_names = ['pt', 'eta', 'phi']
+    )
 
-    def setUp(self):
-        self.obj = Flatten(
-            in_obj = 'Jet',
-            in_attr_names = ['Pt', 'Eta', 'Phi'],
-            out_array_prefix = 'jet',
-            out_array_names = ['pt', 'eta', 'phi']
-        )
-        self.event = MockEvent()
-        self.event.Jet = [ ]
+@pytest.fixture()
+def event():
+    event = MockEvent()
+    event.Jet = [ ]
+    return event
 
-    def tearDown(self):
-        pass
+##__________________________________________________________________||
+def test_repr(obj):
+    repr(obj)
 
-    def test_repr(self):
-        repr(self.obj)
-
-    def test_init_raise(self):
-        self.assertRaises(
-            ValueError,
-            Flatten,
+def test_init_raise():
+    with pytest.raises(ValueError):
+        Flatten(
             in_obj = 'Jet',
             in_attr_names = ['Pt', 'Eta', 'Phi'],
             out_array_prefix = 'jet',
             out_array_names = ['pt', 'eta'] # not the same length as in_array_names
         )
 
-    def test_begin(self):
+def test_begin(obj, event):
+    obj.begin(event)
+    assert event.jet_pt == [ ]
+    assert event.jet_eta == [ ]
+    assert event.jet_phi == [ ]
 
-        obj = self.obj
-        event = self.event
+def test_begin_empty_names(event):
 
-        obj.begin(event)
-        self.assertEqual([ ], event.jet_pt)
-        self.assertEqual([ ], event.jet_eta)
-        self.assertEqual([ ], event.jet_phi)
+    obj = Flatten(
+        in_obj = 'Jet',
+        in_attr_names = [ ], # empty
+        out_array_prefix = 'jet'
+    )
 
-    def test_begin_empty_names(self):
+    obj.begin(event)
 
-        obj = Flatten(
-            in_obj = 'Jet',
-            in_attr_names = [ ], # empty
-            out_array_prefix = 'jet'
-        )
-        event = self.event
+def test_event(obj, event):
 
-        obj.begin(event)
+    obj.begin(event)
 
-    def test_event(self):
+    event.Jet[:] = [
+        Object([('Pt', 40.0), ('Eta', 1.1), ('Phi', 0.1)]),
+        Object([('Pt', 30.0), ('Eta', 2.1), ('Phi', 0.2)]),
+        Object([('Pt', 20.0), ('Eta', 3.1), ('Phi', 0.3)]),
+    ]
+    obj.event(event)
+    assert event.jet_pt == [40.0, 30.0, 20.0]
+    assert event.jet_eta == [1.1, 2.1, 3.1]
+    assert event.jet_phi == [0.1, 0.2, 0.3]
 
-        obj = self.obj
-        event = self.event
+def test_event_empty(obj, event):
 
-        obj.begin(event)
+    obj.begin(event)
 
-        event.Jet[:] = [
-            Object([('Pt', 40.0), ('Eta', 1.1), ('Phi', 0.1)]),
-            Object([('Pt', 30.0), ('Eta', 2.1), ('Phi', 0.2)]),
-            Object([('Pt', 20.0), ('Eta', 3.1), ('Phi', 0.3)]),
-        ]
-        obj.event(event)
-        self.assertEqual([40.0, 30.0, 20.0], event.jet_pt)
-        self.assertEqual([1.1, 2.1, 3.1], event.jet_eta)
-        self.assertEqual([0.1, 0.2, 0.3], event.jet_phi)
+    event.Jet[:] = [ ]
+    obj.event(event)
+    assert event.jet_pt == [ ]
+    assert event.jet_eta == [ ]
+    assert event.jet_phi == [ ]
 
-    def test_event_empty(self):
+def test_event_empty_after_non_empty(obj, event):
 
-        obj = self.obj
-        event = self.event
+    obj.begin(event)
 
-        obj.begin(event)
+    event.Jet[:] = [
+        Object([('Pt', 40.0), ('Eta', 1.1), ('Phi', 0.1)]),
+        Object([('Pt', 30.0), ('Eta', 2.1), ('Phi', 0.2)]),
+        Object([('Pt', 20.0), ('Eta', 3.1), ('Phi', 0.3)]),
+    ]
+    obj.event(event)
+    assert event.jet_pt == [40.0, 30.0, 20.0]
+    assert event.jet_eta == [1.1, 2.1, 3.1]
+    assert event.jet_phi == [0.1, 0.2, 0.3]
 
-        event.Jet[:] = [ ]
-        obj.event(event)
-        self.assertEqual([ ], event.jet_pt)
-        self.assertEqual([ ], event.jet_eta)
-        self.assertEqual([ ], event.jet_phi)
+    event.Jet[:] = [ ]
+    obj.event(event)
+    assert event.jet_pt == [ ]
+    assert event.jet_eta == [ ]
+    assert event.jet_phi == [ ]
 
-    def test_event_empty_after_non_empty(self):
+def test_end(obj, event):
 
-        obj = self.obj
-        event = self.event
+    obj.begin(event)
+    assert obj.out_arrays is not None
+    assert obj.zipped_out_arrays is not None
 
-        obj.begin(event)
-
-        event.Jet[:] = [
-            Object([('Pt', 40.0), ('Eta', 1.1), ('Phi', 0.1)]),
-            Object([('Pt', 30.0), ('Eta', 2.1), ('Phi', 0.2)]),
-            Object([('Pt', 20.0), ('Eta', 3.1), ('Phi', 0.3)]),
-        ]
-        obj.event(event)
-        self.assertEqual([40.0, 30.0, 20.0], event.jet_pt)
-        self.assertEqual([1.1, 2.1, 3.1], event.jet_eta)
-        self.assertEqual([0.1, 0.2, 0.3], event.jet_phi)
-
-        event.Jet[:] = [ ]
-        obj.event(event)
-        self.assertEqual([ ], event.jet_pt)
-        self.assertEqual([ ], event.jet_eta)
-        self.assertEqual([ ], event.jet_phi)
-
-    def test_end(self):
-
-        obj = self.obj
-        event = self.event
-
-        obj.begin(event)
-        self.assertIsNotNone(obj.out_arrays)
-        self.assertIsNotNone(obj.zipped_out_arrays)
-        obj.end()
-        self.assertIsNone(obj.out_arrays)
-        self.assertIsNone(obj.zipped_out_arrays)
+    obj.end()
+    assert obj.out_arrays is None
+    assert obj.zipped_out_arrays is None
 
 ##__________________________________________________________________||
