@@ -7,7 +7,7 @@ python:
 # command to run tests
 
 script:
-  - pytest --cov
+  - pytest --cov=scribblers/ --cov=tests/
 
 after_success:
   - coverage combine
