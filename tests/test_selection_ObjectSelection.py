@@ -1,4 +1,6 @@
-import unittest
+# Tai Sakuma <tai.sakuma@gmail.com>
+
+import pytest
 
 from scribblers.selection import ObjectSelection
 from scribblers.obj import Object
@@ -20,64 +22,54 @@ class MockSelection():
         self.is_end_called = True
 
 ##__________________________________________________________________||
-class Test_Object(unittest.TestCase):
+@pytest.fixture()
+def obj():
+    selection = MockSelection()
 
-    def setUp(self):
-        self.selection = MockSelection()
+    return ObjectSelection(
+        in_obj = 'Jet',
+        out_obj = 'JetSelected',
+        selection = selection
+    )
 
-        self.obj = ObjectSelection(
-            in_obj = 'Jet',
-            out_obj = 'JetSelected',
-            selection = self.selection
-        )
+@pytest.fixture()
+def event():
+    event = MockEvent()
+    event.Jet = [ ]
+    return event
 
-        self.event = MockEvent()
-        self.event.Jet = [ ]
+##__________________________________________________________________||
+def test_repr(obj):
+    repr(obj)
 
-    def tearDown(self):
-        pass
+def test_begin(obj, event):
 
-    def test_repr(self):
-        repr(self.obj)
+    assert not obj.selection.is_begin_called
 
-    def test_begin(self):
+    obj.begin(event)
+    assert event.JetSelected == [ ]
+    assert obj.selection.is_begin_called
 
-        obj = self.obj
-        event = self.event
+def test_end(obj, event):
 
-        self.assertFalse(self.selection.is_begin_called)
+    obj.begin(event)
+    assert not obj.selection.is_end_called
+    assert obj.out is not None
 
-        obj.begin(event)
-        self.assertEqual([ ], event.JetSelected)
-        self.assertTrue(self.selection.is_begin_called)
+    obj.end()
+    assert obj.selection.is_end_called
+    assert obj.out is None
 
-    def test_end(self):
+def test_event(obj, event):
 
-        obj = self.obj
-        event = self.event
+    obj.begin(event)
 
-        obj.begin(event)
+    in_obj = [Object((('pt', 50), )), Object((('pt', 45), )), Object((('pt', 20), ))]
+    event.Jet[:] = in_obj
 
-        self.assertFalse(self.selection.is_end_called)
-        self.assertIsNotNone(obj.out)
-
-        obj.end()
-        self.assertTrue(self.selection.is_end_called)
-        self.assertIsNone(obj.out)
-
-    def test_event(self):
-
-        obj = self.obj
-        event = self.event
-
-        obj.begin(event)
-
-        in_obj = [Object((('pt', 50), )), Object((('pt', 45), )), Object((('pt', 20), ))]
-        event.Jet[:] = in_obj
-
-        obj.event(event)
-        self.assertEqual([Object((('pt', 50), )), Object((('pt', 45), ))], event.JetSelected)
-        self.assertIs(in_obj[0], event.JetSelected[0]) # not a copy
-        self.assertIs(in_obj[1], event.JetSelected[1]) # not a copy
+    obj.event(event)
+    assert event.JetSelected == [Object((('pt', 50), )), Object((('pt', 45), ))]
+    assert event.JetSelected[0] is in_obj[0] # not a copy
+    assert event.JetSelected[1] is in_obj[1] # not a copy
 
 ##__________________________________________________________________||
