@@ -1,6 +1,7 @@
 # Tai Sakuma <tai.sakuma@gmail.com>
 
 import copy
+import logging
 import pytest
 
 from scribblers.obj import Object
@@ -32,8 +33,13 @@ def test_init_copy(obj):
     assert obj is not obj_copy
     assert obj._attrdict is not obj_copy._attrdict
 
-def test_init_copy_extra_args(obj):
-    obj_copy = Object(obj, 1)
+def test_init_copy_extra_args(obj, caplog):
+    with caplog.at_level(logging.INFO, logger = 'scribblers.obj'):
+        obj_copy = Object(obj, 1)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == 'WARNING'
+    assert 'extra arguments' in caplog.records[0].msg
+
     assert obj == obj_copy
     assert obj is not obj_copy
     assert obj._attrdict is not obj_copy._attrdict
