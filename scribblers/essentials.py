@@ -65,4 +65,7 @@ class FuncOnNumpyArrays(object):
         self._attach_to_event(event)
         self.out[:] = self.func(*[np.array(getattr(event, n)) for n in self.src_arrays])
 
+    def end(self):
+        self.func = None
+
 ##__________________________________________________________________||
