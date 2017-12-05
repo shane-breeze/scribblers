@@ -35,8 +35,8 @@ def test_event(obj, event):
 
     obj.begin(event)
 
-    event.mht[:] = [25]
-    event.met[:] = [12]
+    event.mht[:] = [25.0]
+    event.met[:] = [12.0]
     obj.event(event)
     assert event.mhtOverMet == [pytest.approx(2.083333)]
 
