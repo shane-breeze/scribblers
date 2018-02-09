@@ -27,7 +27,8 @@ class Object(object):
                 logger = logging.getLogger(__name__)
                 logger.warning('extra arguments are given: args = {}, kwargs = {}'.format(args[1:], kwargs))
 
-        object.__setattr__(self, '_attrdict', attrdict)
+        #object.__setattr__(self, '_attrdict', attrdict)
+        self.__dict__["_attrdict"] = attrdict
         # self._attrdict = attrdict # this would cause infinite
                                     # recursion as __setattr__() is
                                     # implemented
@@ -38,20 +39,20 @@ class Object(object):
     def __repr__(self):
         return '{}({})'.format(
             self.__class__.__name__,
-            ', '.join(['{} = {!r}'.format(k, v) for k, v in self._attrdict.items()])
+            ', '.join(['{} = {!r}'.format(k, v) for k, v in self.__dict__["_attrdict"].items()])
         )
 
     def __getattr__(self, attr):
         try:
-            return self._attrdict[attr]
+            return self.__dict__["_attrdict"][attr]
         except KeyError:
             raise AttributeError('{} has no attribute "{}"'.format(self, attr))
 
     def __setattr__(self, name, value):
-        self._attrdict[name] = value
+        self.__dict__["_attrdict"][name] = value
 
     def __eq__(self, other):
-        return self._attrdict == other._attrdict
+        return self.__dict__["_attrdict"] == other.__dict__["_attrdict"]
 
 ##__________________________________________________________________||
 class Flatten(object):
@@ -139,5 +140,42 @@ class Flatten(object):
     def end(self):
         self.out_arrays = None
         self.zipped_out_arrays = None
+
+##__________________________________________________________________||
+class Collection(object):
+    """
+    Scribbler to add an object collection to the event. Each element of the
+    collection is an object of the Object class
+    """
+    def __init__(self, obj_name, attrs=[]):
+        """
+        :param obj_name: Name to use for the object collection with n{name} and
+                         {name}_{attr} in the event
+        :param attr: list of attributes to assign to each object in the
+                     collection
+        """
+        self.obj_name = obj_name
+        self.attrs = attrs
+
+    def begin(self, event):
+        self.objs = [ ]
+        self._attach_to_event(event)
+
+        self.ev_attrs = [getattr(event, self.obj_name+"_"+k) for k in self.attrs]
+        self.nobjs = getattr(event, "n{}".format(self.obj_name))
+
+    def _attach_to_event(self, event):
+        setattr(event, self.obj_name, self.objs)
+
+    def event(self, event):
+        self._attach_to_event(event)
+        self. objs[:] = [
+            Object([
+                (n, x[idx])
+                for n,x in zip(self.attrs, self.ev_attrs)
+            ])
+            for idx in range(self.nobjs[0])
+        ]
+
 
 ##__________________________________________________________________||
