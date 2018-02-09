@@ -22,6 +22,7 @@ class ObjectSelection(object):
         )
 
     def begin(self, event):
+        self.in_obj = getattr(event, self.in_obj_name)
         self.out = [ ]
         self._attach_to_event(event)
 
@@ -33,8 +34,7 @@ class ObjectSelection(object):
 
     def event(self, event):
         self._attach_to_event(event)
-
-        self.out[:] = [o for o in getattr(event, self.in_obj_name) if self.selection(o)]
+        self.out[:] = [o for o in self.in_obj if self.selection(o)]
 
     def end(self):
         if hasattr(self.selection, 'end'):
