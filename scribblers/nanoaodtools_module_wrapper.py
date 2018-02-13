@@ -5,12 +5,12 @@ import importlib
 ##__________________________________________________________________||
 class EventWrapper(object):
     def __init__(self, event):
-        self.__dict__["event"] = event
+        self.event = event
 
     def __getattr__(self, attr):
         if attr.startswith("__"):
             raise AttributeError(attr)
-        val = getattr(self.__dict__["event"], attr)
+        val = getattr(super(EventWrapper,self).__getattribute__("event"), attr)
 
         # countarray is not None for collections
         if val.countarray is None:
@@ -21,7 +21,7 @@ class EventWrapper(object):
         return val
 
     def __setattr__(self, attr, val):
-        setattr(self.__dict__["event"], attr, val)
+        setattr(self.event, attr, val)
 
 ##__________________________________________________________________||
 class TreeWrapper(object):
