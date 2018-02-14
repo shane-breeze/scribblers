@@ -169,7 +169,7 @@ class Collection(object):
     def event(self, event):
         self._attach_to_event(event)
         self. objs[:] = [
-            Object([
+            Object([("idx", idx)]+[
                 (n, x[idx])
                 for n,x in zip(self.attrs, self.ev_attrs)
             ])
